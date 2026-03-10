@@ -1,5 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { buffer } from 'micro';
+import { Readable } from 'stream';
+
+async function buffer(readable: Readable) {
+  const chunks: Buffer[] = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
 import { stripe } from '@/lib/stripe';
 import { createAdminSupabase } from '@/lib/supabaseServer';
 import type Stripe from 'stripe';
