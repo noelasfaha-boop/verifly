@@ -36,11 +36,14 @@ export interface CreatorStats {
   description?: string;
   subscription_price: number;
   is_verified: boolean;
-  total_trades: number;
-  winning_trades: number;
+  total_picks: number;
+  winning_picks: number;
   win_rate: number;
   total_profit: number;
+  total_units: number;
   avg_roi: number;
+  total_trades: number;
+  winning_trades: number;
   subscriber_count: number;
   follower_count: number;
 }
@@ -90,6 +93,20 @@ export interface Follower {
   created_at: string;
 }
 
+export interface Game {
+  id: string;
+  sport: string;
+  league: string;
+  espn_event_id?: string;
+  home_team: string;
+  away_team: string;
+  start_time: string;
+  status: 'scheduled' | 'live' | 'final';
+  home_score?: number;
+  away_score?: number;
+  created_at: string;
+}
+
 export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
@@ -105,13 +122,26 @@ export interface Pick {
   id: string;
   creator_id: string;
   sport: string;
-  event: string;
+  event?: string;
   bet_type: string;
   odds?: string;
   stake_units: number;
-  pick_description: string;
+  pick_description?: string;
+  league?: string;
+  event_id?: string;
+  image_url?: string;
+  caption?: string;
+  graded_by?: 'manual' | 'auto';
   result: PickResult;
   profit_loss?: number;
   created_at: string;
   settled_at?: string;
+  // joined fields from games table
+  games?: {
+    home_team: string;
+    away_team: string;
+    status: string;
+    home_score?: number;
+    away_score?: number;
+  };
 }

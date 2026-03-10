@@ -13,11 +13,16 @@ export interface RawBet {
 }
 
 export async function scrapeDraftKings(username: string, password: string): Promise<RawBet[]> {
+  if (process.env.MOCK_ONLY === 'true') {
+    console.log('[DraftKings] MOCK_ONLY mode, returning mock data');
+    return getMockBets('draftkings');
+  }
+
   let browser: any;
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     });
   } catch (err: any) {
     console.error('[DraftKings] Chromium launch failed, using mock data:', err.message);

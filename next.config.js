@@ -7,6 +7,7 @@ const nextConfig = {
       'lh3.googleusercontent.com',
       'cdn.discordapp.com',
       'pbs.twimg.com',
+      'iimkozmqmmekwlpyhmzm.supabase.co',
     ],
   },
 };

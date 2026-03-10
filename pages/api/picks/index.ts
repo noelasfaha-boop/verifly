@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const admin = createAdminSupabase();
     let query = admin
       .from('picks')
-      .select('*')
+      .select('*, games(home_team, away_team, status, home_score, away_score)')
       .eq('creator_id', creatorId)
       .order('created_at', { ascending: false })
       .limit(parseInt(limit as string));
@@ -27,15 +27,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.json({ data });
   }
 
-  // POST — create a new pick
+  // POST — create a new pick (immutable after creation)
   if (req.method === 'POST') {
     const supabase = createServerSupabase(req, res);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { creatorId, sport, event, bet_type, odds, stake_units, pick_description } = req.body;
+    const {
+      creatorId, sport, league, event, event_id, bet_type, odds,
+      stake_units, pick_description, image_url, caption,
+    } = req.body;
 
-    // Verify ownership
+    if (!pick_description && !image_url) {
+      return res.status(400).json({ error: 'Provide pick_description or image_url' });
+    }
+
     const { data: creator } = await supabase
       .from('creators')
       .select('id')
@@ -49,12 +55,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .insert({
         creator_id: creatorId,
         sport,
-        event,
+        league: league || null,
+        event: event || null,
+        event_id: event_id || null,
         bet_type,
         odds: odds || null,
         stake_units,
-        pick_description,
+        pick_description: pick_description || null,
+        image_url: image_url || null,
+        caption: caption || null,
         result: 'pending',
+        graded_by: event_id ? 'auto' : 'manual',
       })
       .select()
       .single();

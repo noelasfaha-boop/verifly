@@ -2,11 +2,16 @@ import { chromium } from 'playwright';
 import type { RawBet } from './draftkings';
 
 export async function scrapeUnderdog(username: string, password: string): Promise<RawBet[]> {
+  if (process.env.MOCK_ONLY === 'true') {
+    console.log('[Underdog] MOCK_ONLY mode, returning mock data');
+    return getMockUnderdogBets();
+  }
+
   let browser: any;
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     });
   } catch (err: any) {
     console.error('[Underdog] Chromium launch failed, using mock data:', err.message);

@@ -12,8 +12,9 @@ interface Props {
 const CATEGORIES = ['all', 'trading', 'crypto', 'sports', 'other'] as const;
 const SORT_OPTIONS = [
   { value: 'avg_roi', label: 'Avg ROI' },
-  { value: 'total_profit', label: 'Total P&L' },
+  { value: 'total_units', label: 'Total Units' },
   { value: 'win_rate', label: 'Win Rate' },
+  { value: 'total_profit', label: 'Total P&L' },
   { value: 'subscriber_count', label: 'Subscribers' },
 ] as const;
 
