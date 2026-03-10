@@ -8,7 +8,7 @@ import { scrapeUnderdog } from './scrapers/underdog';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT ?? 4000;
+const PORT = process.env.PORT ?? 8080;
 const SCRAPER_SECRET = process.env.SCRAPER_SECRET ?? 'dev-secret';
 
 app.use(express.json());
