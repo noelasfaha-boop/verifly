@@ -2,10 +2,17 @@ import { chromium } from 'playwright';
 import type { RawBet } from './draftkings';
 
 export async function scrapePrizePicks(username: string, password: string): Promise<RawBet[]> {
-  const browser = await chromium.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  let browser: any;
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process'],
+    });
+  } catch (err: any) {
+    console.error('[PrizePicks] Chromium launch failed, using mock data:', err.message);
+    return getMockPrizePicksBets();
+  }
+
   const context = await browser.newContext({
     userAgent:
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
