@@ -97,3 +97,21 @@ export interface ApiResponse<T = unknown> {
 
 export type Category = 'trading' | 'crypto' | 'sports' | 'other';
 export type Platform = 'binance' | 'coinbase' | 'draftkings' | 'prizepicks' | 'underdog' | 'manual';
+
+export type PickResult = 'pending' | 'win' | 'loss' | 'push' | 'void';
+export type PickSport = 'NBA' | 'NFL' | 'MLB' | 'NHL' | 'Soccer' | 'Tennis' | 'Crypto' | 'Stocks' | 'Other';
+
+export interface Pick {
+  id: string;
+  creator_id: string;
+  sport: string;
+  event: string;
+  bet_type: string;
+  odds?: string;
+  stake_units: number;
+  pick_description: string;
+  result: PickResult;
+  profit_loss?: number;
+  created_at: string;
+  settled_at?: string;
+}

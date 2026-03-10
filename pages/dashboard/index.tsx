@@ -112,7 +112,8 @@ export default function DashboardPage() {
             {/* Quick links */}
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {[
-                { href: '/dashboard/performance', label: 'Log Trade', icon: '📈', desc: 'Add a new performance entry' },
+                { href: '/dashboard/picks', label: 'Post Pick', icon: '🎯', desc: 'Post a sports bet or trade pick' },
+                { href: '/dashboard/performance', label: 'Log Trade', icon: '📈', desc: 'Add a manual performance entry' },
                 { href: '/dashboard/accounts', label: 'Linked Accounts', icon: '🔗', desc: 'Manage exchange connections' },
                 { href: '/dashboard/analytics', label: 'Analytics', icon: '📊', desc: 'View subscriber & revenue data' },
               ].map((item) => (

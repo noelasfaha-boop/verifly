@@ -4,7 +4,8 @@ import PerformanceCard from '@/components/PerformanceCard';
 import StatsCard from '@/components/StatsCard';
 import SubscribeButton from '@/components/SubscribeButton';
 import ShareableCard from '@/components/ShareableCard';
-import type { CreatorStats, PerformanceEntry } from '@/types';
+import PicksFeed from '@/components/PicksFeed';
+import type { CreatorStats, PerformanceEntry, Pick } from '@/types';
 import { createAdminSupabase } from '@/lib/supabaseServer';
 import { useAuth } from '@/context/AuthContext';
 import type { GetServerSideProps } from 'next';
@@ -12,13 +13,14 @@ import type { GetServerSideProps } from 'next';
 interface Props {
   creator: CreatorStats;
   entries: PerformanceEntry[];
+  picks: Pick[];
   isSubscribed: boolean;
 }
 
-export default function CreatorProfilePage({ creator, entries, isSubscribed }: Props) {
+export default function CreatorProfilePage({ creator, entries, picks, isSubscribed }: Props) {
   const { user } = useAuth();
   const [showShare, setShowShare] = useState(false);
-  const [tab, setTab] = useState<'trades' | 'about'>('trades');
+  const [tab, setTab] = useState<'picks' | 'trades' | 'about'>('picks');
 
   const closedEntries = entries.filter((e) => e.closed_at);
   const openEntries = entries.filter((e) => !e.closed_at);
@@ -119,17 +121,21 @@ export default function CreatorProfilePage({ creator, entries, isSubscribed }: P
         {/* Tabs */}
         <div className="mt-8 border-b border-dark-600">
           <div className="flex gap-6">
-            {(['trades', 'about'] as const).map((t) => (
+            {([
+              { key: 'picks', label: `Picks (${picks.length})` },
+              { key: 'trades', label: `Trades (${entries.length})` },
+              { key: 'about', label: 'About' },
+            ] as const).map((t) => (
               <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`pb-3 text-sm font-semibold capitalize transition-colors ${
-                  tab === t
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`pb-3 text-sm font-semibold transition-colors ${
+                  tab === t.key
                     ? 'border-b-2 border-brand-400 text-brand-400'
                     : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
-                {t === 'trades' ? `Trades (${entries.length})` : 'About'}
+                {t.label}
               </button>
             ))}
           </div>
@@ -137,6 +143,10 @@ export default function CreatorProfilePage({ creator, entries, isSubscribed }: P
 
         {/* Tab content */}
         <div className="mt-6">
+          {tab === 'picks' && (
+            <PicksFeed picks={picks} />
+          )}
+
           {tab === 'trades' && (
             <div className="space-y-8">
               {openEntries.length > 0 && (
@@ -188,24 +198,27 @@ export const getServerSideProps: GetServerSideProps = async ({ params, req }) =>
 
   if (!creatorStat) return { notFound: true };
 
-  const { data: entries } = await supabase
-    .from('performance_entries')
-    .select('*')
-    .eq('creator_id', creatorStat.creator_id)
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  // Check if current user is subscribed
-  let isSubscribed = false;
-  const authHeader = req.headers.cookie ?? '';
-  // We rely on client-side for subscription check in this simplified version
-  // A full implementation would verify the session server-side
+  const [{ data: entries }, { data: picks }] = await Promise.all([
+    supabase
+      .from('performance_entries')
+      .select('*')
+      .eq('creator_id', creatorStat.creator_id)
+      .order('created_at', { ascending: false })
+      .limit(50),
+    supabase
+      .from('picks')
+      .select('*')
+      .eq('creator_id', creatorStat.creator_id)
+      .order('created_at', { ascending: false })
+      .limit(100),
+  ]);
 
   return {
     props: {
       creator: creatorStat,
       entries: entries ?? [],
-      isSubscribed,
+      picks: picks ?? [],
+      isSubscribed: false,
     },
   };
 };
