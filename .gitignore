@@ -1,0 +1,21 @@
+# env
+.env.local
+.env*.local
+.env
+
+# Next.js
+.next/
+out/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Scraper build
+scraper/node_modules/
+scraper/dist/
+
+# OS
+.DS_Store
+node_modules/
+scraper/node_modules/
